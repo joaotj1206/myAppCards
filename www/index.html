@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Atividade em aula - Usando API Rest</title>
+    <title>JohnAppCards</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -43,7 +43,7 @@
 		});	
 		
 		$(window).on('load', function(){
-			$(".se-pre-con").fadeOut("slow");
+			$(".carregando-slow").fadeOut("slow");
 		});
 		
 		/*
@@ -67,10 +67,10 @@
 				dataType: 'json',
 				data: 'id=' + id,
 				beforeSend: function() {
-					$(".se-pre-con").fadeIn("slow");
+					$(".carregando-slow").fadeIn("slow");
 				},
 				success : function(result){
-					
+					$(".carregando-slow").fadeOut("slow");
 					if  (result.success) {						
 						alert(result.data);
 						$("#listar").empty();
@@ -78,6 +78,7 @@
 					}	
 				},
 				error : function(xhr, resp, text){
+					$(".carregando-slow").fadeOut("slow");
 					console.error("Erro na exclusão do Card.");
 				}			
 			
@@ -93,16 +94,17 @@
 				dataType: 'json',
 				data: 'id=' + id,
 				beforeSend: function() {
-					$(".se-pre-con").fadeIn("slow");
+					$(".carregando-slow").fadeIn("slow");
 				},
 				success : function(result){
-					
+					$(".carregando-slow").fadeOut("slow");
 					if  (result.success) {												
 						$("#btn_curtir_" + id ).html("Curtir (" + result.qtd_likes + ")");
 						alert(result.data);						
 					}	
 				},
 				error : function(xhr, resp, text){
+				$(".carregando-slow").fadeOut("slow");
 					console.error("Erro ao curtir Card.");
 				}			
 			
@@ -120,18 +122,20 @@
 				dataType: 'json',
 				data: 'url_imagem=' + url + '&descricao='+descricao,
 				beforeSend: function() {
-					$(".se-pre-con").fadeIn("slow");
+					$(".carregando-slow").fadeIn("slow");
 				},
 				success : function(result){
-					
+					$(".carregando-slow").fadeOut("slow");					
 					if  (result.success) {						
 						alert(result.data);
 						$("#url-card").val('');
 						$("#descricao-card").val('');
+						$("#cadastrar-cards").modal('hide');
 						listarCards();
 					}	
 				},
 				error : function(xhr, resp, text){
+					$(".carregando-slow").fadeOut("slow");
 					console.error("Nenhum card localizado.");
 				}			
 			
@@ -146,9 +150,10 @@
 				type: 'GET',
 				dataType: 'json',
 				beforeSend: function() {
-					$(".se-pre-con").fadeIn("slow");
+					$(".carregando-slow").fadeIn("slow");
 				},
 				success : function(result){
+					$(".carregando-slow").fadeOut("slow");
 					
 					if  (result.success) {
 						var card;
@@ -171,6 +176,7 @@
 					}
 				},
 				error : function(xhr, resp, text){
+					$(".carregando-slow").fadeOut("slow");
 					console.error("Nenhum card localizado.");
 				}			
 			
@@ -183,7 +189,7 @@
 
 	.no-js #loader { display: none;  }
 	.js #loader { display: block; position: absolute; left: 100px; top: 0; }
-	.se-pre-con {
+	.carregando-slow {
 		position: fixed;
 		left: 0px;
 		top: 0px;
@@ -201,35 +207,36 @@
 		</div>
 		
 	</div>
-		
-	<div class="container">
-		<div class="modal fade" tabindex="-1" role="dialog" id="cadastrar-cards">
-		  <div class="modal-dialog" role="document">
-			<div class="modal-content">
-			  <div class="modal-header">
-				<h5 class="modal-title">Cadastrar Card</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				  <span aria-hidden="true">&times;</span>
-				</button>
-			  </div>
-			  <div class="modal-body">
-				<form>
-				  <div class="form-group">
-					<label for="descricao-card" class="col-form-label">Descrição:</label>
-					<input type="text" class="form-control" id="descricao-card">
+	<div class="carregando-slow"></div>
+		<div class="container">
+			<div class="modal fade" tabindex="-1" role="dialog" id="cadastrar-cards">
+			  <div class="modal-dialog" role="document">
+				<div class="modal-content">
+				  <div class="modal-header">
+					<h5 class="modal-title">Cadastrar Card</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					  <span aria-hidden="true">&times;</span>
+					</button>
 				  </div>
-				  <div class="form-group">
-				  <label for="url-card" class="col-form-label">URL:</label>
-					<input type="text" class="form-control" id="url-card">
+				  <div class="modal-body">
+					<form>
+					  <div class="form-group">
+						<label for="descricao-card" class="col-form-label">Descrição:</label>
+						<input type="text" class="form-control" id="descricao-card">
+					  </div>
+					  <div class="form-group">
+					  <label for="url-card" class="col-form-label">URL:</label>
+						<input type="text" class="form-control" id="url-card">
+					  </div>
+					</form>
 				  </div>
-				</form>
-			  </div>
-			  <div class="modal-footer">
-				<button type="button" id="salvarCard" onclick="cadastrarCards();" class="btn btn-primary">Salvar</button>
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				  <div class="modal-footer">
+					<button type="button" id="salvarCard" onclick="cadastrarCards();" class="btn btn-primary">Salvar</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				  </div>
+				</div>
 			  </div>
 			</div>
-		  </div>
 		</div>
 	</div>
 	
