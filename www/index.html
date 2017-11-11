@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Atividade em aula - Usando API Rest</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script src="js/jquery-3.2.1.js"></script>
+	<script src="js/popper.min.js" ></script>
+    <script src="js/bootstrap.min.js" ></script>
+	<script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+	
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" >
+  </head>
+  <body> 
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="#">Sistema de Cards</a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item">
+			<input type="button" id="consultarCards" onclick="listarCards();" value = "Listar" >
+		  </li>
+		  <li class="nav-item">
+			<input type="button" id="cadastrarCard" data-toggle="modal" data-target="#cadastrar-cards" value = "Cadastrar" >
+		  </li>
+		</ul>
+	  </div>
+	</nav>
+	
+	
+	<script>
+		$(document).ready(function(){					
+			listarCards();		
+		});	
+		
+		$(window).on('load', function(){
+			$(".se-pre-con").fadeOut("slow");
+		});
+		
+		/*
+		$("#consultarCards").click(function(){			
+			listarCards();				
+		});
+		
+		$("#salvarCard").click(function(){			
+			alert("Iniciou o cadastro.");
+			cadastrarCards();
+			alert("Executou o cadastro.");
+		});
+		*/
+		
+		function deletarCard(id) {
+		
+			$.ajax({
+				
+				url: 'http://andrecosta.info/cards/',
+				type: 'DELETE',
+				dataType: 'json',
+				data: 'id=' + id,
+				beforeSend: function() {
+					$(".se-pre-con").fadeIn("slow");
+				},
+				success : function(result){
+					
+					if  (result.success) {						
+						alert(result.data);
+						$("#listar").empty();
+						listarCards();						
+					}	
+				},
+				error : function(xhr, resp, text){
+					console.error("Erro na exclusão do Card.");
+				}			
+			
+			});		
+		}
+		
+		function curtirCard(id) {
+		
+			$.ajax({
+				
+				url: 'http://andrecosta.info/cards/like/',
+				type: 'POST',
+				dataType: 'json',
+				data: 'id=' + id,
+				beforeSend: function() {
+					$(".se-pre-con").fadeIn("slow");
+				},
+				success : function(result){
+					
+					if  (result.success) {												
+						$("#btn_curtir_" + id ).html("Curtir (" + result.qtd_likes + ")");
+						alert(result.data);						
+					}	
+				},
+				error : function(xhr, resp, text){
+					console.error("Erro ao curtir Card.");
+				}			
+			
+			});		
+		}
+		
+		function cadastrarCards() {
+		
+			var url = $("#url-card").val();
+			var descricao = $("#descricao-card").val();
+			$.ajax({
+				
+				url: 'http://andrecosta.info/cards/',
+				type: 'POST',
+				dataType: 'json',
+				data: 'url_imagem=' + url + '&descricao='+descricao,
+				beforeSend: function() {
+					$(".se-pre-con").fadeIn("slow");
+				},
+				success : function(result){
+					
+					if  (result.success) {						
+						alert(result.data);
+						$("#url-card").val('');
+						$("#descricao-card").val('');
+						listarCards();
+					}	
+				},
+				error : function(xhr, resp, text){
+					console.error("Nenhum card localizado.");
+				}			
+			
+			});		
+		}
+
+		function listarCards() {
+			$("#listar").empty();
+			$.ajax({
+				
+				url: 'http://andrecosta.info/cards/',
+				type: 'GET',
+				dataType: 'json',
+				beforeSend: function() {
+					$(".se-pre-con").fadeIn("slow");
+				},
+				success : function(result){
+					
+					if  (result.success) {
+						var card;
+						$.each(result.data, function(i, item) {
+							card = '';									
+							card = '<div class="col-lg-4 col-sm-6">' +
+							'<div class="card" style="width: 18rem;">' +
+							'<img class="card-img-top" src="' + item.url_imagem + '" alt="Card image cap">' +
+							'<div class="card-body">' +
+							'<p class="card-text">' + item.descricao + '</p>'+
+							'<div>'+
+							'<button type="button" id="btn_curtir_'+item.id + '" class="btn btn-primary" onclick="curtirCard('+item.id+')">Curtir ('+item.likes+')</button>' + 
+							'<button type="button" class="btn btn-danger" onclick="deletarCard('+item.id+')">Deletar</button>' +
+							'</div>'+
+							'</div>' +
+							'</div>';
+							console.log(card);
+							$("#listar").append(card);
+						});				
+					}
+				},
+				error : function(xhr, resp, text){
+					console.error("Nenhum card localizado.");
+				}			
+			
+			});
+		
+		}		
+	</script>
+	
+	<style>
+
+	.no-js #loader { display: none;  }
+	.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+	.se-pre-con {
+		position: fixed;
+		left: 0px;
+		top: 0px;
+		width: 100%;
+		height: 100%;
+		z-index: 9999;
+		filter:alpha(opacity=50); opacity:0.5;
+		background: url(https://www.equilter.com/assets/images/loading.gif) center no-repeat #fff;
+	}
+	</style>
+	
+	<div class="container" id="listar-cards"  >
+		<div class="row" id="listar">
+		
+		</div>
+		
+	</div>
+		
+	<div class="container">
+		<div class="modal fade" tabindex="-1" role="dialog" id="cadastrar-cards">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title">Cadastrar Card</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<form>
+				  <div class="form-group">
+					<label for="descricao-card" class="col-form-label">Descrição:</label>
+					<input type="text" class="form-control" id="descricao-card">
+				  </div>
+				  <div class="form-group">
+				  <label for="url-card" class="col-form-label">URL:</label>
+					<input type="text" class="form-control" id="url-card">
+				  </div>
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" id="salvarCard" onclick="cadastrarCards();" class="btn btn-primary">Salvar</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	</div>
+	
+  </body>
+</html>
